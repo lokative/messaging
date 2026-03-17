@@ -1,6 +1,6 @@
 {
   "name": "@lokative/messaging",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "type": "module",
   "main": "./dist/index.js",
@@ -27,7 +27,7 @@
     "@nestjs/core": "^10.0.0 || ^11.0.0",
     "nats": "^2.0.0",
     "kafkajs": "^2.0.0",
-    "redis": "^4.0.0",
+    "redis": "^5.0.0",
     "reflect-metadata": "^0.1.13 || ^0.2.0"
   },
   "peerDependenciesMeta": {
@@ -47,7 +47,7 @@
     "@types/node": "^25.5.0",
     "kafkajs": "^2.0.0",
     "nats": "^2.0.0",
-    "redis": "^4.0.0",
+    "redis": "^5.0.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.0.0",
     "typescript": "^5.7.0",
