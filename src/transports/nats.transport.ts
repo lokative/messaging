@@ -49,11 +49,18 @@ export class NatsTransport implements MessagingTransport {
                 const result = await iter.next();
                 if (result.done) return { done: true, value: undefined };
                 const msg = result.value;
+                const raw = msg.data.toString();
+                let data: any;
+                try {
+                    data = JSON.parse(raw);
+                } catch {
+                    data = raw;
+                }
                 return {
                     done: false,
                     value: {
                         subject: msg.subject,
-                        data: JSON.parse(msg.data.toString()),
+                        data,
                         ack: () => msg.ack(),
                         nak: () => msg.nak(),
                     },

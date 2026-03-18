@@ -37,9 +37,15 @@ export class RedisTransport implements MessagingTransport {
         let waiting: ((value: IteratorResult<MessageEnvelope>) => void) | null = null;
 
         await this.sub.subscribe(subject, (message, channel) => {
+            let data: any;
+            try {
+                data = JSON.parse(message);
+            } catch {
+                data = message;
+            }
             const envelope: MessageEnvelope = {
                 subject: channel,
-                data: JSON.parse(message),
+                data,
                 ack: () => { },   // redis pub/sub has no ack mechanism
                 nak: () => { },
             };

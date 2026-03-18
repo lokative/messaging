@@ -48,9 +48,16 @@ export class KafkaTransport implements MessagingTransport {
 
         await consumer.run({
             eachMessage: async ({ topic, message }: EachMessagePayload) => {
+                const raw = message.value?.toString() ?? '';
+                let data: any;
+                try {
+                    data = JSON.parse(raw);
+                } catch {
+                    data = raw;
+                }
                 const envelope: MessageEnvelope = {
                     subject: topic,
-                    data: JSON.parse(message.value?.toString() ?? '{}'),
+                    data,
                     ack: () => { },   // kafkajs auto-commits offsets
                     nak: () => { },
                 };
