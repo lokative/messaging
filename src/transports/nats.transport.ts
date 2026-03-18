@@ -42,10 +42,11 @@ export class NatsTransport implements MessagingTransport {
         opts.deliverTo(durable);
 
         const sub = await this.js.subscribe(subject, opts);
+        const iter = (sub as any)[Symbol.asyncIterator]();
 
         const iterator: AsyncIterator<MessageEnvelope> = {
             async next() {
-                const result = await (sub as any)[Symbol.asyncIterator]().next();
+                const result = await iter.next();
                 if (result.done) return { done: true, value: undefined };
                 const msg = result.value;
                 return {
