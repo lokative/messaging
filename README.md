@@ -23,13 +23,30 @@ npm install redis
 
 ---
 
+## Imports
+
+Transports are isolated behind subpath exports so only the dependency you use gets loaded:
+
+```typescript
+// Core (always needed)
+import { MessagingModule, MessagingPublisher, Incoming, Outgoing } from '@lokative/messaging';
+
+// Pick one transport
+import { NatsTransport } from '@lokative/messaging/nats';
+import { KafkaTransport } from '@lokative/messaging/kafka';
+import { RedisTransport } from '@lokative/messaging/redis';
+```
+
+---
+
 ## Quick Start
 
 ### NATS JetStream
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { MessagingModule, NatsTransport } from '@lokative/messaging';
+import { MessagingModule } from '@lokative/messaging';
+import { NatsTransport } from '@lokative/messaging/nats';
 
 @Module({
   imports: [
@@ -54,7 +71,8 @@ export class AppModule {}
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { MessagingModule, KafkaTransport } from '@lokative/messaging';
+import { MessagingModule } from '@lokative/messaging';
+import { KafkaTransport } from '@lokative/messaging/kafka';
 
 @Module({
   imports: [
@@ -77,7 +95,8 @@ export class AppModule {}
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { MessagingModule, RedisTransport } from '@lokative/messaging';
+import { MessagingModule } from '@lokative/messaging';
+import { RedisTransport } from '@lokative/messaging/redis';
 
 @Module({
   imports: [
@@ -309,7 +328,8 @@ interface SubscribeOptions {
 ```typescript
 // app.module.ts
 import { Module } from '@nestjs/common';
-import { MessagingModule, NatsTransport } from '@lokative/messaging';
+import { MessagingModule } from '@lokative/messaging';
+import { NatsTransport } from '@lokative/messaging/nats';
 import { OrderModule } from './order/order.module';
 
 @Module({
@@ -390,7 +410,7 @@ export class OrderHandler {
 To switch this app to Kafka, change only the module registration:
 
 ```typescript
-import { KafkaTransport } from '@lokative/messaging';
+import { KafkaTransport } from '@lokative/messaging/kafka';
 
 MessagingModule.register({
   transport: KafkaTransport,
@@ -405,7 +425,7 @@ MessagingModule.register({
 Or to Redis:
 
 ```typescript
-import { RedisTransport } from '@lokative/messaging';
+import { RedisTransport } from '@lokative/messaging/redis';
 
 MessagingModule.register({
   transport: RedisTransport,
@@ -421,6 +441,8 @@ No changes needed in services or handlers.
 
 ### Exports
 
+From `@lokative/messaging`:
+
 | Export                     | Type        | Description                                    |
 | -------------------------- | ----------- | ---------------------------------------------- |
 | `MessagingModule`          | Module      | NestJS dynamic module                          |
@@ -432,14 +454,29 @@ No changes needed in services or handlers.
 | `Subscription`             | Interface   | Async-iterable subscription                    |
 | `SubscribeOptions`         | Interface   | Options passed to `subscribe()`                |
 | `MESSAGING_TRANSPORT`      | Token       | DI token for the transport provider            |
-| `NatsTransport`            | Injectable  | Built-in NATS JetStream transport              |
-| `NatsTransportOptions`     | Interface   | Options for `NatsTransport`                    |
-| `KafkaTransport`           | Injectable  | Built-in Kafka transport                       |
-| `KafkaTransportOptions`    | Interface   | Options for `KafkaTransport`                   |
-| `RedisTransport`           | Injectable  | Built-in Redis Pub/Sub transport               |
-| `RedisTransportOptions`    | Interface   | Options for `RedisTransport`                   |
 | `Incoming`                 | Decorator   | Subscribe a method to a subject                |
 | `Outgoing`                 | Decorator   | Auto-publish a method's return value           |
+
+From `@lokative/messaging/nats`:
+
+| Export                | Type        | Description                       |
+| --------------------- | ----------- | --------------------------------- |
+| `NatsTransport`       | Injectable  | Built-in NATS JetStream transport |
+| `NatsTransportOptions`| Interface   | Options for `NatsTransport`       |
+
+From `@lokative/messaging/kafka`:
+
+| Export                 | Type        | Description                |
+| ---------------------- | ----------- | -------------------------- |
+| `KafkaTransport`       | Injectable  | Built-in Kafka transport   |
+| `KafkaTransportOptions`| Interface   | Options for `KafkaTransport` |
+
+From `@lokative/messaging/redis`:
+
+| Export                 | Type        | Description                      |
+| ---------------------- | ----------- | -------------------------------- |
+| `RedisTransport`       | Injectable  | Built-in Redis Pub/Sub transport |
+| `RedisTransportOptions`| Interface   | Options for `RedisTransport`     |
 
 ### Injection
 

@@ -11,6 +11,24 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "default": "./dist/cjs/index.js"
+    },
+    "./nats": {
+      "types": "./dist/esm/nats.d.ts",
+      "import": "./dist/esm/nats.js",
+      "require": "./dist/cjs/nats.js",
+      "default": "./dist/cjs/nats.js"
+    },
+    "./kafka": {
+      "types": "./dist/esm/kafka.d.ts",
+      "import": "./dist/esm/kafka.js",
+      "require": "./dist/cjs/kafka.js",
+      "default": "./dist/cjs/kafka.js"
+    },
+    "./redis": {
+      "types": "./dist/esm/redis.d.ts",
+      "import": "./dist/esm/redis.js",
+      "require": "./dist/cjs/redis.js",
+      "default": "./dist/cjs/redis.js"
     }
   },
   "files": [
