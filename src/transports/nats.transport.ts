@@ -39,7 +39,7 @@ export class NatsTransport implements MessagingTransport {
         const opts = consumerOpts();
         opts.durable(durable);
         opts.ackExplicit();
-        opts.deliverTo(durable);
+        opts.deliverTo(`_INBOX.${durable}.${subject.replace(/[.*>]/g, '_')}`);
 
         const sub = await this.js.subscribe(subject, opts);
         const iter = (sub as any)[Symbol.asyncIterator]();
