@@ -44,7 +44,7 @@ export class NatsTransport implements MessagingTransport {
         const sub = await this.js.subscribe(subject, opts);
         const iter = (sub as any)[Symbol.asyncIterator]();
 
-        const iterator: AsyncIterator<MessageEnvelope> = {
+        const iterator: AsyncIterableIterator<MessageEnvelope> = {
             async next() {
                 const result = await iter.next();
                 if (result.done) return { done: true, value: undefined };
@@ -66,9 +66,10 @@ export class NatsTransport implements MessagingTransport {
                     },
                 };
             },
+            [Symbol.asyncIterator]() { return this; },
         };
 
-        return { [Symbol.asyncIterator]: () => iterator };
+        return iterator;
     }
 
     private async ensureStreams(streams: { name: string; subjects: string[] }[]) {

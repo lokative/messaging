@@ -5,9 +5,7 @@ export interface MessageEnvelope {
     nak(): void
 }
 
-export interface Subscription {
-    [Symbol.asyncIterator](): AsyncIterator<MessageEnvelope>
-}
+export interface Subscription extends AsyncIterableIterator<MessageEnvelope> {}
 
 export interface MessagingTransport {
     connect(): Promise<void>

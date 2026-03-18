@@ -59,16 +59,17 @@ export class RedisTransport implements MessagingTransport {
             }
         });
 
-        const iterator: AsyncIterator<MessageEnvelope> = {
+        const iterator: AsyncIterableIterator<MessageEnvelope> = {
             next() {
                 if (buffer.length > 0) {
-                    return Promise.resolve({ done: false, value: buffer.shift()! });
+                    return Promise.resolve({ done: false as const, value: buffer.shift()! });
                 }
                 return new Promise(r => { waiting = r; });
             },
+            [Symbol.asyncIterator]() { return this; },
         };
 
-        return { [Symbol.asyncIterator]: () => iterator };
+        return iterator;
     }
 
 }
