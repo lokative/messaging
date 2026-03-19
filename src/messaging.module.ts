@@ -8,7 +8,9 @@ import { MessagingConsumerRegistry } from "./messaging.registry";
 @Module({})
 export class MessagingModule {
 
-    static register(config: MessagingConfig): DynamicModule {
+    static register<TOptions extends Record<string, any> = Record<string, any>>(
+        config: MessagingConfig<TOptions>,
+    ): DynamicModule {
 
         return {
             module: MessagingModule,

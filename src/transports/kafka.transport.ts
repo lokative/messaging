@@ -14,7 +14,7 @@ export class KafkaTransport implements MessagingTransport {
     private kafka: Kafka;
     private producer: Producer;
 
-    constructor(@Inject('MSG_CONFIG') private config: MessagingConfig) { }
+    constructor(@Inject('MSG_CONFIG') private config: MessagingConfig<KafkaTransportOptions>) { }
 
     async connect() {
         const opts = this.config.transportOptions as KafkaTransportOptions;
@@ -41,7 +41,10 @@ export class KafkaTransport implements MessagingTransport {
         });
 
         await consumer.connect();
-        await consumer.subscribe({ topic: subject, fromBeginning: false });
+        await consumer.subscribe({
+            topic: subject,
+            fromBeginning: options?.startFrom === 'first',
+        });
 
         const buffer: MessageEnvelope[] = [];
         let waiting: ((value: IteratorResult<MessageEnvelope>) => void) | null = null;

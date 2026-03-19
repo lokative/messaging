@@ -15,6 +15,8 @@ export interface MessagingTransport {
 
 export interface SubscribeOptions {
     group?: string
+    durable?: boolean
+    startFrom?: 'first' | 'new'
 }
 
 export const MESSAGING_TRANSPORT = 'MESSAGING_TRANSPORT';

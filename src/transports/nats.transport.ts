@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { MessagingTransport, MessageEnvelope, Subscription, SubscribeOptions } from '../transport.interface';
 import type { MessagingConfig } from '../messaging.config';
-import { JetStreamClient, JetStreamManager, NatsConnection, connect, consumerOpts } from 'nats';
+import { JetStreamClient, JetStreamManager, NatsConnection, connect, consumerOpts, DeliverPolicy } from 'nats';
 
 export interface NatsTransportOptions {
     servers: string[]
@@ -18,7 +18,7 @@ export class NatsTransport implements MessagingTransport {
     private js: JetStreamClient;
     private jsm: JetStreamManager;
 
-    constructor(@Inject('MSG_CONFIG') private config: MessagingConfig) { }
+    constructor(@Inject('MSG_CONFIG') private config: MessagingConfig<NatsTransportOptions>) { }
 
     async connect() {
         const opts = this.config.transportOptions as NatsTransportOptions;
@@ -35,11 +35,28 @@ export class NatsTransport implements MessagingTransport {
     }
 
     async subscribe(subject: string, options?: SubscribeOptions): Promise<Subscription> {
-        const durable = options?.group ?? 'nest-consumer';
+        const group = options?.group ?? 'nest-consumer';
+        const isDurable = options?.durable !== false;          // default: durable
+        const startFrom = options?.startFrom ?? 'new';         // default: new messages only
+
+        const safeSuffix = subject.replace(/[.*>]/g, '-');
         const opts = consumerOpts();
-        opts.durable(durable);
+
+        if (isDurable) {
+            const durableName = `${group}-${safeSuffix}`;
+            opts.durable(durableName);
+            opts.deliverTo(`${durableName}-inbox`);
+        } else {
+            opts.deliverTo(`_INBOX.${group}.${safeSuffix}`);
+        }
+
         opts.ackExplicit();
-        opts.deliverTo(`_INBOX.${durable}.${subject.replace(/[.*>]/g, '_')}`);
+
+        if (startFrom === 'first') {
+            opts.deliverAll();
+        } else {
+            opts.deliverNew();
+        }
 
         const sub = await this.js.subscribe(subject, opts);
         const iter = (sub as any)[Symbol.asyncIterator]();

@@ -15,7 +15,7 @@ export class RedisTransport implements MessagingTransport {
     private pub: RedisClientType;
     private sub: RedisClientType;
 
-    constructor(@Inject('MSG_CONFIG') private config: MessagingConfig) { }
+    constructor(@Inject('MSG_CONFIG') private config: MessagingConfig<RedisTransportOptions>) { }
 
     async connect() {
         const opts = this.config.transportOptions as RedisTransportOptions;

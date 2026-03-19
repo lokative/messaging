@@ -21,6 +21,8 @@ const mocks = vi.hoisted(() => {
         durable: vi.fn(),
         ackExplicit: vi.fn(),
         deliverTo: vi.fn(),
+        deliverAll: vi.fn(),
+        deliverNew: vi.fn(),
     }));
 
     return {
@@ -170,8 +172,43 @@ describe('NatsTransport', () => {
         await transport.subscribe('order.created', { group: 'my-group' });
 
         const opts = mocks.mockConsumerOpts.mock.results[0].value;
-        expect(opts.durable).toHaveBeenCalledWith('my-group');
+        expect(opts.durable).toHaveBeenCalledWith('my-group-order-created');
         expect(opts.ackExplicit).toHaveBeenCalled();
+        expect(opts.deliverNew).toHaveBeenCalled();
+    });
+
+    it('subscribe creates ephemeral consumer when durable is false', async () => {
+        const mockSub = {
+            [Symbol.asyncIterator]: () => ({
+                next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+            }),
+        };
+        mocks.mockSubscribe.mockResolvedValue(mockSub);
+
+        const transport = new NatsTransport(makeConfig());
+        await transport.connect();
+        await transport.subscribe('order.created', { durable: false });
+
+        const opts = mocks.mockConsumerOpts.mock.results[0].value;
+        expect(opts.durable).not.toHaveBeenCalled();
+        expect(opts.ackExplicit).toHaveBeenCalled();
+    });
+
+    it('subscribe uses deliverAll when startFrom is first', async () => {
+        const mockSub = {
+            [Symbol.asyncIterator]: () => ({
+                next: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+            }),
+        };
+        mocks.mockSubscribe.mockResolvedValue(mockSub);
+
+        const transport = new NatsTransport(makeConfig());
+        await transport.connect();
+        await transport.subscribe('order.created', { startFrom: 'first' });
+
+        const opts = mocks.mockConsumerOpts.mock.results[0].value;
+        expect(opts.deliverAll).toHaveBeenCalled();
+        expect(opts.deliverNew).not.toHaveBeenCalled();
     });
 
 });

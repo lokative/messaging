@@ -36,8 +36,8 @@ export class MessagingConsumerRegistry implements OnModuleInit {
     }
 
     private async startConsumer(instance: any, handler: any, meta: any) {
-        const group = this.config.consumers?.group;
-        const sub = await this.transport.subscribe(meta.subject, { group });
+        const { retry, dlq, ...subscribeOpts } = this.config.consumers ?? {};
+        const sub = await this.transport.subscribe(meta.subject, subscribeOpts);
 
         for await (const msg of sub) {
             try {
